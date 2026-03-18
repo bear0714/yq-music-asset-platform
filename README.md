@@ -17,6 +17,16 @@ The system separates external event-driven flows (payments) from internal determ
 
 ---
 
+## System at a Glance
+
+```
+Order → Matching Engine → Trades → Ledger → Balances
+Stripe → Funds Flow → Ledger → Balances
+Revenue → Distribution → Ledger → Balances
+```
+
+---
+
 ## Core Capabilities
 
 ### Asset and Catalog
@@ -80,6 +90,16 @@ The system separates external event-driven flows (payments) from internal determ
 - deferred settlement with retry mechanism
 - pre-funded withdrawal and controlled payout execution
 - ledger-enforced exactly-once posting
+
+---
+
+
+## Design Documents
+
+- [System Overview](./architecture/system-overview.md)
+- [Matching Engine](./architecture/matching-engine.md)
+- [Ledger Design](./architecture/ledger-design.md)
+- [Funds Flow](./architecture/funds-flow.md)
 
 ---
 

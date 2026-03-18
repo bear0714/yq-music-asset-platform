@@ -1,5 +1,3 @@
-
-
 # Matching Engine Design
 
 The matching engine is responsible for order execution in the trading system.
@@ -87,12 +85,57 @@ An order goes through the following states:
 When a new order arrives:
 
 1. Validate order (price, quantity, user balance pre-check)
-2. Attempt to match against opposite side of the book
+2. Attempt to match against opposite side of the book in bounded batches
 3. Generate one or more trades
 4. Update order states
 5. Forward trade results to settlement (ledger)
 
 ---
+
+## Processing Model
+
+The matching engine processes orders using a partitioned, message-driven model.
+
+- orders are published to a message queue
+- partition key = instrumentId
+- all orders for the same instrument are processed sequentially
+
+This guarantees:
+
+- strict ordering per instrument
+- no concurrent matching for the same order book
+- deterministic execution
+
+At the same time:
+
+- different instruments are processed in parallel
+- horizontal scalability is achieved through partition distribution
+
+---
+
+## Pre-Trade Validation & Reservation
+
+Before an order enters the matching phase, the system performs strict pre-trade checks.
+
+### Buy Order
+
+- sufficient available balance must exist
+- required funds are moved from:
+  - available → locked
+
+### Sell Order
+
+- sufficient asset quantity must exist
+- required shares are moved from:
+  - available → locked
+
+This reservation guarantees:
+
+- no double spending
+- no overselling
+- deterministic settlement
+
+The matching engine operates only on already-reserved orders.
 
 ## Matching Rules
 
@@ -134,7 +177,7 @@ Each successful match produces a trade:
 
 - buyer order id
 - seller order id
-- price (resting order price)
+- price (resting order price / maker price)
 - quantity
 - timestamp
 
@@ -180,6 +223,7 @@ If failure occurs before settlement:
 The matching engine guarantees:
 
 - no order is matched more than its quantity
+- all matched orders must have pre-reserved capital
 - no trade is generated without a valid opposing order
 - total matched quantity never exceeds available liquidity
 

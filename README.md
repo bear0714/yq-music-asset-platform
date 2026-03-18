@@ -1,5 +1,5 @@
 # YQ Music Asset Platform
-Digital asset platform with matching engine, ledger, and settlement system
+Digital asset platform with exchange-grade matching engine, ledger, and deterministic settlement
 
 Music asset platform for fractional ownership, trading, revenue distribution, and settlement.
 
@@ -13,6 +13,8 @@ YQ is a multi-domain platform that combines:
 
 The platform is designed as a modular backend system with strong emphasis on transactional integrity, clear domain boundaries, and operational scalability.
 
+The system separates external event-driven flows (payments) from internal deterministic flows (matching and settlement), ensuring financial correctness under concurrency, retries, and partial failures.
+
 ---
 
 ## Core Capabilities
@@ -25,41 +27,41 @@ The platform is designed as a modular backend system with strong emphasis on tra
 ### Trading
 - order placement and cancellation
 - bid / ask order book
-- matching engine
+- deterministic matching engine (price-time priority, partitioned execution)
 - trade execution and post-trade processing
 
 ### Ledger and Settlement
-- double-entry ledger
-- available vs locked balances
-- settlement and reconciliation flows
-- dividend / revenue distribution
+- double-entry ledger as financial source of truth
+- available vs locked balance model
+- idempotent settlement with strong invariants
+- dividend / revenue distribution via ledger
 
 ### Payments and Funds Flow
-- Stripe-based deposit flow
-- withdrawal request and payout workflow
-- idempotent settlement handling
+- Stripe-based deposit and withdrawal flows
+- deferred settlement based on finalized financial data
+- exactly-once financial posting via ledger idempotence
 
 ---
 
 ## Architecture Highlights
 
 - domain-oriented service design across account, music, and trade
-- microservices-based backend implemented with Java / Spring Boot
-- event-driven architecture using ActiveMQ / JMS where asynchronous processing is appropriate
-- ledger-based transactional integrity for balances and settlement
-- modular persistence design using MySQL, with selected use of other data stores in adjacent systems
-- payment integration with Stripe for fiat movement
+- per-instrument serialized matching via message partitioning (JMS)
+- event-driven architecture for external integrations
+- ledger-enforced financial correctness and idempotence
+- modular persistence design using MySQL
+- Stripe integration with deterministic settlement and retry model
 
 ---
 
 ## Representative Design Areas
 
 ### 1. Matching and Trading Flow
-- accept and validate orders
-- reserve or lock balances
-- match bids and asks
-- create trades and ledger entries
-- update balances and order state atomically
+- validate and accept orders
+- reserve balances (available → locked)
+- deterministic matching (price-time priority)
+- batch execution and trade generation
+- ledger-backed atomic settlement
 
 ### 2. Ledger Model
 - double-entry accounting structure
@@ -73,10 +75,11 @@ The platform is designed as a modular backend system with strong emphasis on tra
 - credit balances through ledger entries
 
 ### 4. Deposit and Withdrawal
-- external payment initiation
-- callback / webhook handling
-- ledger settlement after payment confirmation
-- controlled payout workflow for withdrawals
+- asynchronous Stripe event handling
+- separation of payment success vs financial settlement
+- deferred settlement with retry mechanism
+- pre-funded withdrawal and controlled payout execution
+- ledger-enforced exactly-once posting
 
 ---
 
@@ -99,4 +102,4 @@ This public repository is intended as an architecture and portfolio showcase. It
 
 ## Why This Project Matters
 
-YQ reflects the kind of systems I like to build: platforms with clear domain boundaries, strong transactional correctness, and real business workflows spanning trading, accounting, and payments.
+This project demonstrates the design of a financial system that combines trading, accounting, and external payment integration with strong guarantees around correctness, idempotence, and consistency. It reflects a focus on building systems that behave deterministically even under real-world conditions such as retries, partial failures, and asynchronous external dependencies.

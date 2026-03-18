@@ -1,7 +1,5 @@
 # YQ Music Asset Platform
-Digital asset platform with exchange-grade matching engine, ledger, and deterministic settlement
-
-Music asset platform for fractional ownership, trading, revenue distribution, and settlement.
+Digital asset platform for fractional ownership and trading of music assets, with an exchange-grade matching engine, double-entry ledger, and deterministic settlement.
 
 ## Overview
 
@@ -93,6 +91,11 @@ Revenue → Distribution → Ledger → Balances
 
 ---
 
+## Selected Technical Stack
+
+Java / Spring Boot · MyBatis · MySQL · ActiveMQ / JMS · Stripe · AWS
+
+---
 
 ## Design Documents
 
@@ -102,21 +105,18 @@ Revenue → Distribution → Ledger → Balances
 - [Funds Flow](./architecture/funds-flow.md)
 
 ---
-
-## Selected Technical Stack
-
-Java / Spring Boot · MyBatis · MySQL · ActiveMQ / JMS · Stripe · AWS
-
----
-
 ## Repository Roadmap
 
-This public repository is intended as an architecture and portfolio showcase. It will gradually include:
+This repository focuses primarily on system design, architecture, and financial correctness.
 
+It currently includes:
 - architecture notes
 - domain models and schema excerpts
-- selected code samples
-- sequence diagrams and flow descriptions
+- design documents covering trading, ledger, and funds flow
+
+Planned additions (selective and high-signal only):
+- targeted code excerpts illustrating critical flows (e.g. settlement, idempotence)
+- sequence diagrams for key workflows where clarity benefits from visualization
 
 ---
 
